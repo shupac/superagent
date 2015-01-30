@@ -176,7 +176,7 @@ Emitter.prototype.hasListeners = function(event){
  * TODO: combatible error handling?
  */
 
-module.exports = function(arr, fn, initial){  
+module.exports = function(arr, fn, initial){
   var idx = 0;
   var len = arr.length;
   var curr = arguments.length == 3
@@ -486,8 +486,8 @@ function Response(req, options) {
   options = options || {};
   this.req = req;
   this.xhr = this.req.xhr;
-  this.text = this.req.method !='HEAD' 
-     ? this.xhr.responseText 
+  this.text = this.req.method !='HEAD'
+     ? this.xhr.responseText
      : null;
   this.setStatusProperties(this.xhr.status);
   this.header = this.headers = parseHeader(this.xhr.getAllResponseHeaders());
@@ -648,13 +648,18 @@ function Request(method, url) {
     var res = null;
 
     try {
-      res = new Response(self); 
+      res = new Response(self);
     } catch(e) {
       err = new Error('Parser is unable to parse the response');
       err.parse = true;
       err.original = e;
     }
-
+    if ('function' == typeof self.inspectFunction && !this.inspected ) {
+      if ( self.inspectFunction(err,res)) {
+        this.inspected = true;
+        return;
+      }
+    }
     self.callback(err, res);
   });
 }
